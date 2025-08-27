@@ -87,17 +87,15 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VERSION=${{ steps.version.outputs.version }}
-            TARGETOS=linux
-            TARGETARCH=amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # for some weird reason, this line makes builds from docker buildx available
+          # w/o this line, the argocd image does not update the image
+          provenance: false # This line disables provenance attestation
 
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
